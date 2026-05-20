@@ -1,7 +1,6 @@
 const TOKEN_KEY = "access_token"
 
 export const cookieStorage = {
-  // SET TOKEN
   setToken(token: string, days = 7): void {
     const maxAge = days * 24 * 60 * 60
 
@@ -12,7 +11,6 @@ export const cookieStorage = {
       `samesite=strict`
   },
 
-  // GET TOKEN
   getToken(): string | null {
     const cookies = document.cookie.split("; ")
 
@@ -27,7 +25,6 @@ export const cookieStorage = {
     return null
   },
 
-  // REMOVE TOKEN
   removeToken(): void {
     document.cookie =
       `${TOKEN_KEY}=; ` +
@@ -36,7 +33,6 @@ export const cookieStorage = {
       `samesite=strict`
   },
 
-  // CHECK AUTH
   hasToken(): boolean {
     return !!this.getToken()
   },

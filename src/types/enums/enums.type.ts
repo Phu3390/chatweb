@@ -1,40 +1,40 @@
 export const ConversationParticipantRole = {
-  MEMBER: "member",
-  ADMIN: "admin",
+  MEMBER: "MEMBER",
+  ADMIN: "ADMIN",
 } as const
 
 export type ConversationParticipantRole =
   (typeof ConversationParticipantRole)[keyof typeof ConversationParticipantRole]
 
 export const ConversationType = {
-  PRIVATE: "private",
-  GROUP: "group",
+  PRIVATE: "PRIVATE",
+  GROUP: "GROUP",
 } as const
 
 export type ConversationType =
   (typeof ConversationType)[keyof typeof ConversationType]
 
 export const FriendRequestStatus = {
-  PENDING: "pending",
-  ACCEPTED: "accepted",
-  REJECTED: "rejected",
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
 } as const
 
 export type FriendRequestStatus =
   (typeof FriendRequestStatus)[keyof typeof FriendRequestStatus]
 
 export const MessageType = {
-  TEXT: "text",
-  IMAGE: "image",
-  FILE: "file",
+  TEXT: "TEXT",
+  IMAGE: "IMAGE",
+  FILE: "FILE",
 } as const
 
 export type MessageType =
   (typeof MessageType)[keyof typeof MessageType]
 
 export const UserStatus = {
-  ONLINE: "online",
-  OFFLINE: "offline",
+  ONLINE: "ONLINE",
+  OFFLINE: "OFFLINE",
 } as const
 
 export type UserStatus =

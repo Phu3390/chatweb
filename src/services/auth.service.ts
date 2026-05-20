@@ -1,8 +1,13 @@
-import type { LoginRequest, RegisterRequest } from "../types/request/auth.request";
+import type {
+  LoginRequest,
+  RegisterRequest,
+} from "../types/request/auth.request";
 import type { ApiResponse } from "../types/response/api.response";
-import type { AuthResponse } from "../types/response/response.type";
+import type {
+  AuthResponse,
+  UserResponse,
+} from "../types/response/response.type";
 import { axiosClient } from "./axios";
-
 
 export const authService = {
   login: async (payload: LoginRequest): Promise<ApiResponse<AuthResponse>> => {
@@ -16,6 +21,10 @@ export const authService = {
       "/api/signup",
       payload,
     );
+  },
+
+  getMe: async (): Promise<ApiResponse<UserResponse>> => {
+    return axiosClient.get<UserResponse>("/api/me");
   },
 };
 

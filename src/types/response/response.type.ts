@@ -1,74 +1,79 @@
-import type { ConversationParticipantRole, ConversationType, MessageType } from "../enums/enums.type"
+import {
+  type ConversationParticipantRole,
+  type ConversationType,
+  type MessageType,
+} from "../enums/enums.type";
 
 export interface AuthResponse {
-  token: string
-  isAuth: boolean
+  token: string;
+  isAuth: boolean;
 }
 
 export interface UserResponse {
-  userId: string
-  fullName: string
-  email?: string
-  avatar?: string
+  id: string;
+  fullName: string;
+  email?: string;
+  avatar?: string;
 }
 
 export interface ParticipantResponse {
-  userId: string
-  fullName: string
-  avatar?: string
-  role: ConversationParticipantRole
-  isMuted: boolean
-  joinedAt: string 
+  userId: string;
+  fullName: string;
+  avatar?: string;
+  role: ConversationParticipantRole;
+  isMuted: boolean;
+  joinedAt: string;
 }
 
 export interface ConversationResponse {
-  conversationId: string
-  type: ConversationType
-  name?: string
-  createdAt: string
-  participants: ParticipantResponse[]
+  conversationId: string;
+  type: ConversationType;
+  name?: string;
+  createdAt: string;
+  participants: ParticipantResponse[];
 }
 
 export interface ConversationSummaryResponse {
-  conversationId: string
-  type: ConversationType
-  name?: string
+  conversationId: string;
+  type: ConversationType;
+  name?: string;
+  targetUser?: UserResponse;
+  lastMessage?: string;
+  lastMessageType?: MessageType;
 
-  lastMessage?: string
-  lastMessageType?: MessageType
+  lastSenderId?: string;
+  lastSenderName?: string;
 
-  lastSenderId?: string
-  lastSenderName?: string
+  lastMessageAt?: string;
 
-  lastMessageAt?: string
-
-  unreadCount: number
+  unreadCount: number;
 }
 
+
 export interface FriendResponse {
-  requestId: string
+  requestId: string;
 
-  senderId: string
-  senderName: string
+  senderId: string;
+  senderName: string;
 
-  receiverId: string
-  receiverName: string
+  receiverId: string;
+  receiverName: string;
 
-  status: string
+  status: string;
 
-  createdAt: string
+  createdAt: string;
 }
 
 export interface MessageResponse {
-  messageId: string
+  messageId: string;
 
-  conversation: ConversationResponse
+  conversation: ConversationResponse;
 
-  sender: UserResponse
+  sender: UserResponse;
 
-  content: string
+  content: string;
 
-  messageType: MessageType
+  messageType: MessageType;
 
-  createdAt: string
+  createdAt: string;
 }

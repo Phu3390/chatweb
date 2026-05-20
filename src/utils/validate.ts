@@ -7,6 +7,10 @@ export const validateLogin = (data: { email: string; password: string }) => {
     return "Email không hợp lệ";
   }
 
+  if (data.password.length < 6) {
+    return "Mật khẩu phải từ 6 ký tự trở lên";
+  }
+
   return null;
 };
 
