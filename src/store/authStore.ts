@@ -86,7 +86,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ loading: false })
         return false
       }
-
       const [meRes, convRes] = await Promise.all([
         authService.getMe(),
         conversationService.getMyConversations(),

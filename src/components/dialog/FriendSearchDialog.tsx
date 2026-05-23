@@ -7,6 +7,7 @@ import { User } from "lucide-react";
 import { useFriendStore } from "../../store/friendStore";
 import type { SendFriendRequest } from "../../types/request/friend.request";
 import toast from "react-hot-toast";
+import type { ApiResponse } from "../../types/response/api.response";
 
 type User = {
   id: string;
@@ -24,24 +25,21 @@ export default function FriendSearchDialog({ open, onOpenChange }: Props) {
   const {loading, searchResults, searchUsers} = useUserStore();
   const [sentRequests, setSentRequests] = useState<string[]>([]);
   const sendFriendRequest = useFriendStore((state) => state.sendFriendRequest);
-
   const handleSearch = () => {
     searchUsers(keyword);
   };
 
-  const handleAddFriend = (id: string) => {
-    const payload: SendFriendRequest = { receiverId: id };
-
-    try {
-      sendFriendRequest(payload);
-      console.log("Add friend with id:", payload);
-      setSentRequests([...sentRequests, id]);
-      toast.success("Đã gửi yêu cầu kết bạn");
-    } catch (err: any) {
-      toast.error(err?.message || "Gửi yêu cầu kết bạn thất bại");
-    }
-    
-  };
+const handleAddFriend = async (id: string) => {
+  const payload: SendFriendRequest = { receiverId: id,};
+    const result : ApiResponse<void> =
+    await sendFriendRequest(payload);
+  if (result.code === 200) {
+    setSentRequests((prev) => [...prev,id]);
+    toast.success("Đã gửi yêu cầu kết bạn");
+    return;
+  }
+  toast.error(result.message);
+};
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

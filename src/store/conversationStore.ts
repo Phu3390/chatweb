@@ -2,9 +2,7 @@ import { create } from "zustand"
 import type { ConversationSummaryResponse } from "../types/response/response.type"
 type ConversationState = {
     selectedConversation: ConversationSummaryResponse | null
-    setSelectedConversation: (
-    conversation: ConversationSummaryResponse
-    ) => void
+    setSelectedConversation: (conversation?: ConversationSummaryResponse) => void
 }
 
 

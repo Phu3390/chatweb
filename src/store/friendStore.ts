@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { SendFriendRequest } from "../types/request/friend.request";
+import type { FriendRequestAction, SendFriendRequest } from "../types/request/friend.request";
 import type { ApiResponse } from "../types/response/api.response";
 import { friendService } from "../services/friend.service";
 type FriendState = {
@@ -9,7 +9,8 @@ type FriendState = {
   loading: boolean;
   error: string | null;
 
-  sendFriendRequest: (payload: SendFriendRequest) => Promise<unknown>;
+  sendFriendRequest: (payload: SendFriendRequest) => Promise<ApiResponse<void>>;
+  actionFriendRequest: (payload: FriendRequestAction) => Promise<ApiResponse<void>>;
 };
 
 export const useFriendStore = create<FriendState>((set) => ({
@@ -19,21 +20,30 @@ export const useFriendStore = create<FriendState>((set) => ({
   loading: false,
   error: null,
 
-  sendFriendRequest: async (payload: SendFriendRequest) => {
+  sendFriendRequest: async (payload: SendFriendRequest): Promise<ApiResponse<void>> => {
     try {
       set({ loading: true });
       set({ error: null });
-
-      const result: ApiResponse<void> =
-        await friendService.sendFriendRequest(payload);
-      if (result.code === 200 && result.data) {
-        return true;
-      }
-      throw result;
+      const result = await friendService.sendFriendRequest(payload);
+      return result;
     } catch (error) {
-      const errorResponse = error as ApiResponse<null>;
+      const errorResponse = error as ApiResponse<void>;
       set({ error: errorResponse.message});
-      return false;
+      return errorResponse;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  actionFriendRequest: async (payload: FriendRequestAction): Promise<ApiResponse<void>> => {
+    try {
+      set({ loading: true });
+      set({ error: null });
+      const result = await friendService.actionFriendRequest(payload);
+      return result;
+    } catch (error) {
+      const errorResponse = error as ApiResponse<void>;
+      set({ error: errorResponse.message});
+      return errorResponse;
     } finally {
       set({ loading: false });
     }

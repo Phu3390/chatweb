@@ -1,6 +1,30 @@
 import { Send } from "lucide-react"
+import { useMessageStore } from "../../store/messageStore"
+import type { SendMessageRequest } from "../../types/request/message.request";
+import { MessageType } from "../../types/enums/enums.type";
+import { useConversationState } from "../../store/conversationStore";
+import { useState } from "react";
+
 
 export default function ChatInput() {
+  const {sendMessage, addMessage} = useMessageStore();
+  const {selectedConversation} = useConversationState()
+  const [content, setContent] = useState("")
+
+  const handleSendMessage = async () => {
+    if(!selectedConversation) return
+    const payload: SendMessageRequest = {
+      conversationId: selectedConversation?.conversationId,
+      content: content,
+      messageType: MessageType.TEXT
+    }
+    try {
+      const data = await sendMessage(payload)
+      setContent("")
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
+  }
   return (
     <div
       className="
@@ -41,6 +65,8 @@ export default function ChatInput() {
             dark:text-white
             dark:placeholder:text-white/40
           "
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
         />
 
         <button
@@ -55,6 +81,7 @@ export default function ChatInput() {
             hover:scale-105
             hover:bg-cyan-300
           "
+          onClick={handleSendMessage}
         >
           <Send size={18} />
         </button>

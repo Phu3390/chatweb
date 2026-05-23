@@ -1,4 +1,3 @@
-
 import ChatHeader from "../components/chat/ChatHeader";
 import ChatInput from "../components/chat/ChatInput";
 import { AppSidebar } from "../components/sidebar/AppSidebar";
@@ -38,6 +37,7 @@ export default function ChatLayout({conversations, user, children, headerName, h
         {/* CONTENT */}
         <main className="flex-1 overflow-hidden">
           {children}
+         
         </main>
 
         {/* INPUT */}

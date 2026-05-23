@@ -60,9 +60,9 @@ api.interceptors.response.use(
 
 
 export const axiosClient = {
-  get: async <T>(
+  get: async <T, P = Record<string, unknown>>(
     url: string,
-    params?: Record<string, unknown>
+    params?: P
   ): Promise<ApiResponse<T>> => {
     return api.get(url, { params })
   },

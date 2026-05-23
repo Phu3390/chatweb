@@ -5,3 +5,9 @@ export interface SendMessageRequest {
   content: string
   messageType: MessageType
 }
+
+export interface MessageQuery{
+  conversationId: string
+  before?: Date
+  size?: number
+}

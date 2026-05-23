@@ -9,9 +9,7 @@ export const friendService = {
     return axiosClient.post<void, SendFriendRequest>("/friends/request", payload);
   },
 
-  actionFriendRequest: async (
-    payload: FriendRequestAction,
-  ): Promise<ApiResponse<void>> => {
-    return axiosClient.post<void, FriendRequestAction>("/friends/actions", payload);
+  actionFriendRequest: async (payload: FriendRequestAction,): Promise<ApiResponse<void>> => {
+    return axiosClient.post<void, FriendRequestAction>("/friends/action", payload);
   },
 };

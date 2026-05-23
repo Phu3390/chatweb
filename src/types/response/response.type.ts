@@ -1,4 +1,5 @@
 import {
+  FriendRequestStatus,
   type ConversationParticipantRole,
   type ConversationType,
   type MessageType,
@@ -14,6 +15,19 @@ export interface UserResponse {
   fullName: string;
   email?: string;
   avatar?: string;
+}
+
+export interface FriendRequestResponse{
+  id: string;
+  sender: UserResponse;
+  receiver: UserResponse;
+  status: FriendRequestStatus;
+  createdAt: Date;
+}
+
+export interface FriendRealtimeResponse {
+  requestId: string;
+  sender: UserResponse;
 }
 
 export interface ParticipantResponse {
@@ -40,13 +54,19 @@ export interface ConversationSummaryResponse {
   targetUser?: UserResponse;
   lastMessage?: string;
   lastMessageType?: MessageType;
-
   lastSenderId?: string;
   lastSenderName?: string;
-
   lastMessageAt?: string;
-
   unreadCount: number;
+}
+
+export interface MessageResponse{
+  id: string;
+  conversation: ConversationResponse;
+  sender: UserResponse;
+  content: string;
+  messageType: MessageType;
+  createdAt: string;
 }
 
 

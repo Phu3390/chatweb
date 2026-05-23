@@ -1,11 +1,14 @@
-// components/sidebar/ConversationItem.tsx
-
-import { User } from "lucide-react"
+import { MoreHorizontal, User } from "lucide-react"
 import { SidebarMenuButton } from "../ui/sidebar"
 import { ConversationType } from "../../types/enums/enums.type"
 
 import type { ConversationSummaryResponse } from "../../types/response/response.type"
 import { useConversationState } from "../../store/conversationStore"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
+import { useUserStore } from "../../store/userStore"
+import toast from "react-hot-toast"
+import { useAuthStore } from "../../store/authStore"
+import type { ApiResponse } from "../../types/response/api.response"
 
 interface Props {
   conversation: ConversationSummaryResponse
@@ -13,56 +16,57 @@ interface Props {
 
 export default function ConversationItem({ conversation }: Props) {
   const isPrivate = conversation.type === ConversationType.PRIVATE
-    const setSelectedConversation = useConversationState(
-    (s) => s.setSelectedConversation
-  )
+  const setSelectedConversation = useConversationState((s) => s.setSelectedConversation)
 
+  const displayName = isPrivate ? conversation.targetUser?.fullName : conversation.name
+  const avatar = isPrivate ? conversation.targetUser?.avatar : undefined
+  const { removeFriend } = useUserStore();
 
-  const displayName = isPrivate
-    ? conversation.targetUser?.fullName
-    : conversation.name
-
-  const avatar = isPrivate
-    ? conversation.targetUser?.avatar
-    : undefined
+  const handleClickRemoveFriend = async (id: string) => {
+      const result: ApiResponse<void> = await removeFriend(id)
+      if(result.code === 200) {
+        toast.success("Hủy kết bạn thành công");
+        useAuthStore.getState().initAuth();
+        return
+      }
+      toast.error(result.message);
+  }
 
   return (
-    <SidebarMenuButton
-      className="
-        relative h-16 rounded-2xl px-3
+  <SidebarMenuButton
+    className="
+      group relative h-[72px] rounded-2xl px-3 py-2
 
-        border border-transparent
-        transition-all duration-200
+      border border-transparent
+      transition-all duration-200
 
-        /* ===== BASE (works both themes) ===== */
-        text-sidebar-foreground
+      text-sidebar-foreground
 
-        /* ===== HOVER ===== */
-        hover:bg-sidebar-accent/60
-        hover:border-sidebar-border
+      hover:bg-sidebar-accent/60
+      hover:border-sidebar-border
 
-        /* ===== ACTIVE ===== */
-        data-[active=true]:bg-sidebar-accent
-        data-[active=true]:border-sidebar-border
-        data-[active=true]:text-sidebar-foreground
-      "  onClick={() => setSelectedConversation(conversation)}
-    >
-      {/* AVATAR */}
+      data-[active=true]:bg-sidebar-accent
+      data-[active=true]:border-sidebar-border
+      data-[active=true]:shadow-sm
+    "
+    onClick={() => setSelectedConversation(conversation)}
+  >
+    {/* AVATAR */}
+    <div className="relative shrink-0">
       {avatar ? (
         <img
           src={avatar}
           className="
-            h-11 w-11 rounded-2xl
-            border border-sidebar-border
+            h-12 w-12 rounded-full
             object-cover
-            shadow-sm
+            border border-sidebar-border
           "
         />
       ) : (
         <div
           className="
-            flex h-11 w-11 items-center justify-center
-            rounded-2xl
+            flex h-12 w-12 items-center justify-center
+            rounded-full
 
             bg-sidebar-accent
             border border-sidebar-border
@@ -74,50 +78,134 @@ export default function ConversationItem({ conversation }: Props) {
         </div>
       )}
 
-      {/* CONTENT */}
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* NAME + BADGE */}
-        <div className="flex items-center justify-between gap-2">
-          <span
+      {/* ONLINE DOT */}
+      {/* <div
+        className="
+          absolute bottom-0 right-0
+          h-3.5 w-3.5 rounded-full
+          border-2 border-sidebar
+          bg-emerald-500
+        "
+      /> */}
+    </div>
+
+    {/* CONTENT */}
+    <div className="ml-3 flex min-w-0 flex-1 flex-col justify-center">
+      
+      {/* TOP ROW */}
+      <div className="flex items-center gap-2">
+        
+        {/* NAME */}
+        <span
+          className="
+            truncate
+            text-[15px]
+            font-semibold
+            text-sidebar-foreground
+          "
+        >
+          {displayName}
+        </span>
+
+        {/* UNREAD */}
+        {conversation.unreadCount > 0 && (
+          <div
             className="
-              truncate text-[15px] font-semibold
-              text-sidebar-foreground
+              flex h-5 min-w-5 items-center justify-center
+              rounded-full
+              bg-cyan-500
+              px-1.5
+
+              text-[10px]
+              font-bold
+              text-white
             "
           >
-            {displayName}
-          </span>
+            {conversation.unreadCount}
+          </div>
+        )}
 
-          {conversation.unreadCount > 0 && (
-            <div
+        {/* PUSH MENU TO RIGHT */}
+        <div className="flex-1" />
+
+        {/* MENU */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              onClick={(e) => e.stopPropagation()}
               className="
-                flex h-5 min-w-5 items-center justify-center
-                rounded-full
+                opacity-0
+                transition-all
 
-                bg-cyan-500
-                text-black
+                group-hover:opacity-100
 
-                px-1.5 text-[10px] font-bold
+                flex h-8 w-8 items-center justify-center
+                rounded-lg
 
-                shadow-[0_0_10px_rgba(34,211,238,0.4)]
+                hover:bg-sidebar-accent
               "
             >
-              {conversation.unreadCount}
-            </div>
-          )}
-        </div>
+              <MoreHorizontal size={16} />
+            </button>
+          </DropdownMenuTrigger>
 
-        {/* LAST MESSAGE */}
-        {conversation.lastMessage && (
-          <span
+          <DropdownMenuContent
+            align="end"
             className="
-              truncate text-xs
-              text-sidebar-foreground/60
+              w-44
+              border-sidebar-border
+              bg-sidebar
             "
           >
-            {conversation.lastMessage}
-          </span>
-        )}
+            {isPrivate ? (
+              <>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleClickRemoveFriend(
+                      conversation.targetUser?.id || ""
+                    )
+                  }}
+                >
+                  Hủy kết bạn
+                </DropdownMenuItem>
+              </>
+            ) : (
+              <>
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    console.log("Rời nhóm")
+                  }}
+                >
+                  Rời nhóm
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    console.log("Xem thành viên")
+                  }}
+                >
+                  Xem thành viên
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-    </SidebarMenuButton>
-  )
+
+      {/* LAST MESSAGE */}
+      <div
+        className="
+          mt-1
+          truncate
+          text-sm
+          text-sidebar-foreground/60
+        ">
+        {conversation.lastMessage || "Chưa có tin nhắn"}
+      </div>
+    </div>
+  </SidebarMenuButton>
+)
 }
