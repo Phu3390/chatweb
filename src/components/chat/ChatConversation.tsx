@@ -1,13 +1,11 @@
 import { useEffect, useRef } from "react"
 import { User } from "lucide-react"
 
-import { useConversationState } from "../../store/conversationStore"
+import { useConversationStore } from "../../store/conversationStore"
 import { useMessageStore } from "../../store/messageStore"
 import { useAuthStore } from "../../store/authStore"
-import { useChatRealtime } from "../../store/useFriendRealtime"
-
 export default function ChatConversation() {
-  const selectedConversation = useConversationState(
+  const selectedConversation = useConversationStore(
     (s) => s.selectedConversation
   )
 
@@ -26,10 +24,19 @@ export default function ChatConversation() {
   const hasMore = messagePage?.hasMore ?? false
   const containerRef = useRef<HTMLDivElement>(null)
 
+  const bottomRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    })
+  }, [messages.length])
+  const markConversationRead =useConversationStore(s => s.markConversationRead);
+
   // LOAD FIRST
   useEffect(() => {
     if (!selectedConversation?.conversationId) return
-
+    markConversationRead(selectedConversation.conversationId);
+    useConversationStore.getState().updateConversation(selectedConversation.conversationId)
     loadmessages({
       conversationId:
         selectedConversation.conversationId,
@@ -47,8 +54,6 @@ export default function ChatConversation() {
     container.scrollTop =
       container.scrollHeight
   }, [selectedConversation])
-
-  useChatRealtime({conversationId: selectedConversation?.conversationId})
 
   // LOAD MORE
   const handleScroll = async () => {
@@ -77,24 +82,24 @@ export default function ChatConversation() {
     }
   }
 
-  // EMPTY
-  if (!selectedConversation) {
-    return (
-      <div
-        className="
-          flex h-full items-center
-          justify-center
+    // EMPTY
+    if (!selectedConversation) {
+      return (
+        <div
+          className="
+            flex h-full w-full items-center
+            justify-center
 
-          bg-[#f4f6fb]
-          dark:bg-[#0f172a]
+            bg-[#f4f6fb]
+            dark:bg-[#0f172a]
 
-          text-slate-400
-        "
-      >
-        Chọn một cuộc trò chuyện
-      </div>
-    )
-  }
+            text-slate-400
+          "
+        >
+          Chọn một cuộc trò chuyện
+        </div>
+      )
+    }
 
   return (
     <div
@@ -319,7 +324,8 @@ export default function ChatConversation() {
             )
           }
         )}
+        <div ref={bottomRef} />
       </div>
-    </div>
+    </div >
   )
 }

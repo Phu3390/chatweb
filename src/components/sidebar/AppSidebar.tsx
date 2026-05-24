@@ -11,26 +11,27 @@ import {
 
 import ThemeToggle from "../providers/ThemeToggle"
 import ConversationItem from "../sidebar/ConversationItem"
-
-import type { ConversationSummaryResponse, UserResponse } from "../../types/response/response.type"
 import { LogOut, Plus, User } from "lucide-react"
 import { ConversationType } from "../../types/enums/enums.type"
 import { useAuthStore } from "../../store/authStore"
 import FriendSearchDialog from "../dialog/FriendSearchDialog"
 import { useState } from "react"
+import { useConversationStore } from "../../store/conversationStore"
+import UserProfileDialog from "../dialog/UserProfileDialog"
 
-interface Props {
-  conversations: ConversationSummaryResponse[]
-  user: UserResponse
-}
+export function AppSidebar() {
+  const {conversations} = useConversationStore()
+  const { logout, user } = useAuthStore()
 
+  const [openProfile, setOpenProfile] = useState(false);
+  const handleOpenProfile = () => {
+    setOpenProfile(true);
+  }
 
-export function AppSidebar({ conversations, user }: Props) {
   const [openSearch, setOpenSearch] = useState(false);
   const handleOpenSearch = () => {
       setOpenSearch(true);
   }
-    const { logout } = useAuthStore()
   return (
     
     <Sidebar
@@ -44,6 +45,7 @@ export function AppSidebar({ conversations, user }: Props) {
     >
       
       <FriendSearchDialog open={openSearch} onOpenChange={setOpenSearch}/>
+      <UserProfileDialog open={openProfile} onOpenChange={setOpenProfile}/>
 
       {/* HEADER */}
       <SidebarHeader
@@ -166,7 +168,7 @@ export function AppSidebar({ conversations, user }: Props) {
       "
     >
       {/* LEFT: USER INFO */}
-      <div className="flex items-center gap-3 min-w-0">
+      <div onClick={handleOpenProfile} className="flex items-center gap-3 min-w-0">
         {/* AVATAR */}
         {user.avatar ? (
           <img
@@ -196,6 +198,7 @@ export function AppSidebar({ conversations, user }: Props) {
 
         {/* NAME */}
         <span
+          
           className="
             text-sm font-semibold
             text-slate-900 dark:text-white
@@ -225,7 +228,7 @@ export function AppSidebar({ conversations, user }: Props) {
       </button>
     </div>
   )}
-</SidebarFooter>
+      </SidebarFooter>
     </Sidebar>
   )
 }

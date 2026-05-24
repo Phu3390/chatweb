@@ -1,4 +1,7 @@
-import type { AddParticipantRequest, CreateConversationRequest } from "../types/request/conversation.request";
+import type {
+  AddParticipantRequest,
+  CreateConversationRequest,
+} from "../types/request/conversation.request";
 import type { ApiResponse } from "../types/response/api.response";
 import type {
   ConversationResponse,
@@ -22,7 +25,7 @@ export const conversationService = {
     );
   },
 
-    addParticipant: async (
+  addParticipant: async (
     payload: AddParticipantRequest,
   ): Promise<ApiResponse<void>> => {
     return axiosClient.post<void, AddParticipantRequest>(
@@ -31,4 +34,7 @@ export const conversationService = {
     );
   },
 
+  updateLastReadAt: async (conversationId: string): Promise<ApiResponse<void>> => {
+    return axiosClient.put(`/conversations/lastreadat/${conversationId}`);
+  },
 };

@@ -2,7 +2,6 @@ import { create } from "zustand"
 
 import type {
   UserResponse,
-  ConversationSummaryResponse,
 } from "../types/response/response.type"
 
 import type {
@@ -13,24 +12,20 @@ import type {
 import type { ApiResponse } from "../types/response/api.response"
 
 import { authService } from "../services/auth.service"
-import { conversationService } from "../services/conversation.service"
 import { cookieStorage } from "../utils/cookie"
+import { useConversationStore } from "./conversationStore"
 
 type AuthState = {
   token: string | null
   isAuth: boolean
 
   user: UserResponse | null
-  conversations: ConversationSummaryResponse[]
 
   loading: boolean
   error: string | null
 
   setAuth: (token: string) => void
   setUser: (user: UserResponse) => void
-  setConversations: (
-    conversations: ConversationSummaryResponse[]
-  ) => void
 
   initAuth: () => Promise<boolean>
 
@@ -43,17 +38,12 @@ type AuthState = {
   ) => Promise<ApiResponse<unknown>>
 
   logout: () => void
-
-  clearAuth: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   token: cookieStorage.getToken() || null,
   isAuth: !!cookieStorage.getToken(),
-
   user: null,
-  conversations: [],
-
   loading: false,
   error: null,
 
@@ -68,10 +58,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       user,
     }),
 
-  setConversations: (conversations) =>
-    set({
-      conversations,
-    }),
 
   initAuth: async () => {
     try {
@@ -86,20 +72,13 @@ export const useAuthStore = create<AuthState>((set) => ({
         set({ loading: false })
         return false
       }
-      const [meRes, convRes] = await Promise.all([
+      const [meRes,] = await Promise.all([
         authService.getMe(),
-        conversationService.getMyConversations(),
       ])
 
-      if (
-        meRes.code === 200 &&
-        convRes.code === 200 &&
-        meRes.data &&
-        convRes.data
-      ) {
+      if ( meRes.code === 200 && meRes.data ) {
         set({
           user: meRes.data,
-          conversations: convRes.data,
           token: cookieStorage.getToken(),
           isAuth: true,
         })
@@ -113,7 +92,6 @@ export const useAuthStore = create<AuthState>((set) => ({
         token: null,
         isAuth: false,
         user: null,
-        conversations: [],
       })
       cookieStorage.removeToken()
       return false
@@ -123,6 +101,10 @@ export const useAuthStore = create<AuthState>((set) => ({
       })
     }
   },
+
+  
+
+
   login: async (payload) => {
     try {
       set({
@@ -195,25 +177,14 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     cookieStorage.removeToken()
-
     set({
       token: null,
       isAuth: false,
       user: null,
-      conversations: [],
       error: null,
     })
+    useConversationStore.getState().clearConversationState()
   },
-
-  clearAuth: () =>
-    set({
-      token: null,
-      isAuth: false,
-      user: null,
-      conversations: [],
-      error: null,
-    }),
-
   // checkAuth: () => {
   //   return useAuthStore.getState().isAuth;
   // }

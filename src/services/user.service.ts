@@ -1,4 +1,5 @@
 import type { FriendRequestStatus } from "../types/enums/enums.type";
+import type { UpdateProfileRequest } from "../types/request/auth.request";
 import type { ApiResponse } from "../types/response/api.response";
 import type { FriendRequestResponse, UserResponse } from "../types/response/response.type";
 import { axiosClient } from "./axios";
@@ -24,7 +25,9 @@ export const userService = {
 
   removeFriend: async (friendId: string): Promise<ApiResponse<void>> => {
     return axiosClient.delete<void>(`/friends/remove/${friendId}`);
+  },
+
+  updateProfile: async (profileData: UpdateProfileRequest): Promise<ApiResponse<UserResponse>> => {
+    return axiosClient.put<UserResponse>(`/api/update/profile`, profileData);
   }
-  
-  
 }

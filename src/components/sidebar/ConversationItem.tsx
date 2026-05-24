@@ -3,11 +3,10 @@ import { SidebarMenuButton } from "../ui/sidebar"
 import { ConversationType } from "../../types/enums/enums.type"
 
 import type { ConversationSummaryResponse } from "../../types/response/response.type"
-import { useConversationState } from "../../store/conversationStore"
+import {  useConversationStore } from "../../store/conversationStore"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { useUserStore } from "../../store/userStore"
 import toast from "react-hot-toast"
-import { useAuthStore } from "../../store/authStore"
 import type { ApiResponse } from "../../types/response/api.response"
 
 interface Props {
@@ -16,7 +15,7 @@ interface Props {
 
 export default function ConversationItem({ conversation }: Props) {
   const isPrivate = conversation.type === ConversationType.PRIVATE
-  const setSelectedConversation = useConversationState((s) => s.setSelectedConversation)
+  const setSelectedConversation = useConversationStore((s) => s.setSelectedConversation)
 
   const displayName = isPrivate ? conversation.targetUser?.fullName : conversation.name
   const avatar = isPrivate ? conversation.targetUser?.avatar : undefined
@@ -26,7 +25,7 @@ export default function ConversationItem({ conversation }: Props) {
       const result: ApiResponse<void> = await removeFriend(id)
       if(result.code === 200) {
         toast.success("Hủy kết bạn thành công");
-        useAuthStore.getState().initAuth();
+        useConversationStore.getState().loadConversations();
         return
       }
       toast.error(result.message);
@@ -78,15 +77,6 @@ export default function ConversationItem({ conversation }: Props) {
         </div>
       )}
 
-      {/* ONLINE DOT */}
-      {/* <div
-        className="
-          absolute bottom-0 right-0
-          h-3.5 w-3.5 rounded-full
-          border-2 border-sidebar
-          bg-emerald-500
-        "
-      /> */}
     </div>
 
     {/* CONTENT */}
@@ -121,7 +111,7 @@ export default function ConversationItem({ conversation }: Props) {
               text-white
             "
           >
-            {conversation.unreadCount}
+           {conversation.unreadCount > 5 ? "5+"  : conversation.unreadCount}
           </div>
         )}
 

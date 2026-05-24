@@ -37,3 +37,18 @@ export const validateSignup = (data: {
 
   return null;
 };
+
+export const validateFormUpdateProfile = (data: {  fullName: string;
+  email: string; avatar: string;}) => {
+  if (!data.fullName || !data.email) {
+    return "Vui lòng nhập đầy đủ thông tin";
+  }
+    if (data.fullName.trim().length < 2) {
+    return "Họ tên phải có ít nhất 2 ký tự";
+  }
+
+  if (!data.email.includes("@")) {
+    return "Email không hợp lệ";
+  }
+  return null;
+}

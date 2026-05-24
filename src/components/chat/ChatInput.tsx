@@ -2,13 +2,13 @@ import { Send } from "lucide-react"
 import { useMessageStore } from "../../store/messageStore"
 import type { SendMessageRequest } from "../../types/request/message.request";
 import { MessageType } from "../../types/enums/enums.type";
-import { useConversationState } from "../../store/conversationStore";
+import { useConversationStore } from "../../store/conversationStore";
 import { useState } from "react";
 
 
 export default function ChatInput() {
-  const {sendMessage, addMessage} = useMessageStore();
-  const {selectedConversation} = useConversationState()
+  const {sendMessage,} = useMessageStore();
+  const {selectedConversation} = useConversationStore()
   const [content, setContent] = useState("")
 
   const handleSendMessage = async () => {
@@ -19,7 +19,7 @@ export default function ChatInput() {
       messageType: MessageType.TEXT
     }
     try {
-      const data = await sendMessage(payload)
+      await sendMessage(payload)
       setContent("")
     } catch (error) {
       console.error("Failed to send message:", error);

@@ -3,6 +3,7 @@ import type { FriendRequestResponse, UserResponse } from "../types/response/resp
 import type { ApiResponse } from "../types/response/api.response";
 import { userService } from "../services/user.service";
 import type { FriendRequestStatus } from "../types/enums/enums.type";
+import type { UpdateProfileRequest } from "../types/request/auth.request";
 type UserState = {
   searchResults: UserResponse[];
   countFriendInvitation?: number;
@@ -23,6 +24,7 @@ type UserState = {
   getFriendInvitation: () => Promise<unknown>;
   getFriendStatus: (status: FriendRequestStatus) => Promise<unknown>;
   removeFriend: (friendId: string) => Promise<ApiResponse<void>>;
+  updateProfile:(profileData: UpdateProfileRequest) => Promise<ApiResponse<UserResponse>>;
 
 };
 
@@ -139,5 +141,19 @@ export const useUserStore = create<UserState>((set) => ({
       } finally {
         set({ loading: false });
       }
+    },
+    updateProfile: async (profileData: UpdateProfileRequest): Promise<ApiResponse<UserResponse>> => {
+      try{
+        set({ loading: true });
+        set({ error: null });
+        const result: ApiResponse<UserResponse> = await userService.updateProfile(profileData);
+        return result;
+      }catch(error) {
+        const errorResponse = error as ApiResponse<UserResponse>;
+        set({ error: errorResponse.message });
+        return errorResponse;
+       } finally {
+        set({ loading: false });
+       }
     }
 }));

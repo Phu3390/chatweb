@@ -35,7 +35,7 @@ export default function ChatLayout({conversations, user, children, headerName, h
         </div>
 
         {/* CONTENT */}
-        <main className="flex-1 overflow-hidden">
+        <main className="flex flex-1 flex-col overflow-hidden min-h-0">
           {children}
          
         </main>

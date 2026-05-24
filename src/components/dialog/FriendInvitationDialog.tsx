@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import type { ApiResponse } from "../../types/response/api.response";
 import type { FriendRequestAction } from "../../types/request/friend.request";
 import { useFriendStore } from "../../store/friendStore";
-import { useAuthStore } from "../../store/authStore";
+import { useConversationStore } from "../../store/conversationStore";
 
 type Props = {
   open: boolean;
@@ -52,7 +52,7 @@ export default function FriendInvitationDialog({open, onOpenChange }: Props) {
               ...prev,
               requestId,]);
               useUserStore.getState().getCountFriendInvitation();
-              useAuthStore.getState().initAuth();
+              useConversationStore.getState().loadConversations();
             return;
           }
           toast.error(result.message);
@@ -64,7 +64,7 @@ export default function FriendInvitationDialog({open, onOpenChange }: Props) {
               ...prev,
               requestId,]);
               useUserStore.getState().getCountFriendInvitation();
-              useAuthStore.getState().initAuth();
+              useConversationStore.getState().loadConversations();
             return;
           }
         toast.error(result.message);
