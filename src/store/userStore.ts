@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { FriendRequestResponse, UserResponse } from "../types/response/response.type";
+import type { FriendRequestResponse, UploadResponse, UserResponse } from "../types/response/response.type";
 import type { ApiResponse } from "../types/response/api.response";
 import { userService } from "../services/user.service";
 import type { FriendRequestStatus } from "../types/enums/enums.type";
@@ -25,6 +25,7 @@ type UserState = {
   getFriendStatus: (status: FriendRequestStatus) => Promise<unknown>;
   removeFriend: (friendId: string) => Promise<ApiResponse<void>>;
   updateProfile:(profileData: UpdateProfileRequest) => Promise<ApiResponse<UserResponse>>;
+  uploadImage: (file: File) => Promise<ApiResponse<UploadResponse>>;
 
 };
 
@@ -155,5 +156,21 @@ export const useUserStore = create<UserState>((set) => ({
        } finally {
         set({ loading: false });
        }
+    },
+  uploadImage: async (file: File): Promise<ApiResponse<UploadResponse>> =>  {
+    try {
+      set({ loading: true });
+      set({ error: null });
+      const formData = new FormData();
+      formData.append("file", file);
+      const res: ApiResponse<UploadResponse> = await userService.uploadFile(formData);
+      return res;
+    }catch(error) {
+        const errorResponse = error as ApiResponse<UploadResponse>;
+        set({ error: errorResponse.message });
+        return errorResponse;
+      } finally {
+      set({ loading: false });
     }
+  },
 }));

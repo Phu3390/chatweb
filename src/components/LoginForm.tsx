@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
@@ -7,11 +7,14 @@ import toast from "react-hot-toast"
 import { validateLogin } from "../utils/validate"
 import { LockKeyhole, Mail, Sparkles } from "lucide-react"
 import { useAuthStore } from "../store/authStore"
+import { cookieStorage } from "../utils/cookie"
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 
 
 function LoginForm() {
   const navigate = useNavigate()
+  const hasShownToast = useRef(false);
 
   const { login, loading, error } = useAuthStore()
 
@@ -26,6 +29,11 @@ function LoginForm() {
       ...prev,
       [name]: value,
     }))
+  }
+
+  const handleLoginWithGoogle = () => {
+    cookieStorage.removeSession();
+    window.location.href = `${BASE_URL}/oauth2/authorization/google`;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,6 +51,15 @@ function LoginForm() {
       toast.error(error || "Đăng nhập thất bại")
     }
   }
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error");
+
+    if (error === "NOT_LOGIN_WITH_GOOGLE" && !hasShownToast.current) {
+      toast.error("Gmail của bạn đã có tài khoản, vui lòng đăng nhập bằng Gmail để tiếp tục");
+      hasShownToast.current = true;
+    }
+  }, [location.search]);
 
   return (
     <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#0c1016]/95 px-5 py-7 shadow-[0_30px_80px_-35px_rgba(0,0,0,0.9)] backdrop-blur-xl sm:px-7 sm:py-8">
@@ -135,6 +152,7 @@ function LoginForm() {
       <Button
         type="button"
         variant="outline"
+        onClick={handleLoginWithGoogle}
         className="h-12 w-full rounded-xl border-white/10 bg-white/3 text-slate-100 hover:bg-white/6 hover:text-white"
       >
         <span className="mr-3 flex h-5 w-5 items-center justify-center rounded-full bg-white">

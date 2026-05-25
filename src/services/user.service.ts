@@ -1,8 +1,8 @@
 import type { FriendRequestStatus } from "../types/enums/enums.type";
 import type { UpdateProfileRequest } from "../types/request/auth.request";
 import type { ApiResponse } from "../types/response/api.response";
-import type { FriendRequestResponse, UserResponse } from "../types/response/response.type";
-import { axiosClient } from "./axios";
+import type { FriendRequestResponse, UploadResponse, UserResponse } from "../types/response/response.type";
+import { api, axiosClient } from "./axios";
 
 export const userService = {
   search: async (keyword: string): Promise<ApiResponse<UserResponse[]>> => {
@@ -29,5 +29,13 @@ export const userService = {
 
   updateProfile: async (profileData: UpdateProfileRequest): Promise<ApiResponse<UserResponse>> => {
     return axiosClient.put<UserResponse>(`/api/update/profile`, profileData);
-  }
+  },
+
+  uploadFile: async (formData: FormData): Promise<ApiResponse<UploadResponse>> => {
+    return api.post("/api/upload/image", formData, {headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  },
 }

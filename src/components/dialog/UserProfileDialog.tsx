@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,7 @@ import { useAuthStore } from "../../store/authStore";
 import toast from "react-hot-toast";
 import type { ApiResponse } from "../../types/response/api.response";
 import { useUserStore } from "../../store/userStore";
-import type { UserResponse } from "../../types/response/response.type";
+import type { UploadResponse, UserResponse } from "../../types/response/response.type";
 import { validateFormUpdateProfile } from "../../utils/validate";
 
 type Props = {
@@ -34,7 +34,8 @@ export default function UserProfileDialog({
 }: Props) {
 
   const {user,initAuth} = useAuthStore();
-  const {updateProfile, loading} = useUserStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const {updateProfile, loading, uploadImage} = useUserStore();
 
 
   const [form, setForm] = useState({
@@ -75,6 +76,25 @@ useEffect(() => {
 
   };
 
+  const handleSelectAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const result: ApiResponse<UploadResponse> = await uploadImage(file);
+
+    if (result.code !== 200 || !result.data) {
+        toast.error(result.message);
+        return;
+      }
+      setForm((prev) => ({
+        ...prev,
+        avatar: result.data.url,
+      }));
+
+      toast.success("Tải ảnh thành công");
+    };
+
   return (
     <Dialog
       open={open}
@@ -110,9 +130,9 @@ useEffect(() => {
         >
           <div className="relative">
 
-            {user?.avatar ? (
+            {form?.avatar ? (
               <img
-                src={user.avatar}
+                src={form.avatar}
                 className="
                   h-24 w-24
                   rounded-full
@@ -147,24 +167,28 @@ useEffect(() => {
               </div>
             )}
 
-            <button
-              className="
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="
                 absolute bottom-0 right-0
-
                 flex h-8 w-8
-                items-center
-                justify-center
-
+                items-center justify-center
                 rounded-full
-
                 bg-cyan-500
                 text-white
-
                 shadow-md
               "
-            >
-              <Camera size={16} />
-            </button>
+          >
+            <Camera size={16} />
+          </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleSelectAvatar}
+            />
           </div>
 
           <p
@@ -176,14 +200,6 @@ useEffect(() => {
           >
             Avatar
           </p>
-
-          <Input
-            value={form?.avatar || ""}
-            name="avatar"
-            onChange={handleChange}
-            placeholder="https://..."
-            className="mt-2"
-          />
         </div>
 
         {/* FORM */}

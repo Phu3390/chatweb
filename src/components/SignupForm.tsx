@@ -8,6 +8,7 @@ import { toast } from "react-hot-toast"
 import {  validateSignup } from "../utils/validate"
 import { User, Mail, LockKeyhole, ArrowRight } from "lucide-react"
 import { useAuthStore } from "../store/authStore"
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 
 
@@ -26,6 +27,9 @@ export default function SignupForm() {
       ...prev,
       [e.target.name]: e.target.value,
     }))
+  }
+  const handleLoginWithGoogle = () => {
+    window.location.href = `${BASE_URL}/oauth2/authorization/google`;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,6 +159,7 @@ export default function SignupForm() {
       <Button
         type="button"
         variant="outline"
+        onClick={handleLoginWithGoogle}
         className="h-12 w-full rounded-xl border-white/10 bg-white/3 text-slate-100 hover:bg-white/6 hover:text-white"
       >
         <span className="mr-3 flex h-5 w-5 items-center justify-center rounded-full bg-white">

@@ -17,6 +17,10 @@ export interface UserResponse {
   avatar?: string;
 }
 
+export interface UploadResponse {
+  url: string;
+}
+
 export interface FriendRequestResponse{
   id: string;
   sender: UserResponse;

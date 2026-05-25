@@ -96,3 +96,4 @@ export const axiosClient = {
 }
 
 export default axiosClient
+export { api };

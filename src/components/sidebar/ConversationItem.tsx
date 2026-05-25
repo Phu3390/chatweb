@@ -124,10 +124,10 @@ export default function ConversationItem({ conversation }: Props) {
             <button
               onClick={(e) => e.stopPropagation()}
               className="
-                opacity-0
+                opacity-100
                 transition-all
 
-                group-hover:opacity-100
+               
 
                 flex h-8 w-8 items-center justify-center
                 rounded-lg

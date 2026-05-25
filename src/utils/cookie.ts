@@ -1,4 +1,5 @@
 const TOKEN_KEY = "access_token"
+const JSESSIONID = "JSESSIONID"
 
 export const cookieStorage = {
   setToken(token: string, days = 7): void {
@@ -36,4 +37,12 @@ export const cookieStorage = {
   hasToken(): boolean {
     return !!this.getToken()
   },
+
+  removeSession(): void {
+    document.cookie =
+      `${JSESSIONID}=; ` +
+      `path=/; ` +
+      `expires=Thu, 01 Jan 1970 00:00:00 GMT; ` +
+      `samesite=strict`
+  }
 }
