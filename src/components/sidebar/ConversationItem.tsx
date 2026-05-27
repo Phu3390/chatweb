@@ -1,6 +1,6 @@
 import { MoreHorizontal, User } from "lucide-react"
 import { SidebarMenuButton } from "../ui/sidebar"
-import { ConversationType } from "../../types/enums/enums.type"
+import { ConversationType, MessageType } from "../../types/enums/enums.type"
 
 import type { ConversationSummaryResponse } from "../../types/response/response.type"
 import {  useConversationStore } from "../../store/conversationStore"
@@ -8,6 +8,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useUserStore } from "../../store/userStore"
 import toast from "react-hot-toast"
 import type { ApiResponse } from "../../types/response/api.response"
+import GroupParticipantsDialog from "../dialog/GroupParticipantsDialog"
+import { useState } from "react"
+import AddMemberDialog from "../dialog/AddMemberDialog"
+import UpdateGroupDialog from "../dialog/UpdateGroupDialog"
 
 interface Props {
   conversation: ConversationSummaryResponse
@@ -15,23 +19,63 @@ interface Props {
 
 export default function ConversationItem({ conversation }: Props) {
   const isPrivate = conversation.type === ConversationType.PRIVATE
-  const setSelectedConversation = useConversationStore((s) => s.setSelectedConversation)
 
   const displayName = isPrivate ? conversation.targetUser?.fullName : conversation.name
-  const avatar = isPrivate ? conversation.targetUser?.avatar : undefined
+  const avatar = isPrivate ? conversation.targetUser?.avatar : conversation.avatarGroup
+  const [openMembers, setOpenMembers] = useState(false);
+  const handleOpenMembers = () => {
+      setOpenMembers(true);
+  }
+
+  const [openFriendNotInGroup, setOpenFriendNotInGroup] = useState(false);
+  const handleOpenFriendNotInGroup = () => {
+      setOpenFriendNotInGroup(true);
+  }
+
+    const [openUpdateGroupInfo, setOpenUpdateGroupInfo] = useState(false);
+  const handleOpenUpdateGroupInfo = () => {
+      setOpenUpdateGroupInfo(true);
+  }
+  const {leaveConversationGroup, setSelectedConversation, loadConversations, removeGroupChat} = useConversationStore();
+
+  const isAdmin = conversation.role === "ADMIN";
+
   const { removeFriend } = useUserStore();
+
+  const handleRemoveGroupChat = async () => {
+    try {
+        await removeGroupChat(conversation.conversationId);
+        await loadConversations();
+        toast.success("Xóa nhóm chat thành công");
+    } catch (error) {
+        const err = error as ApiResponse<void>;
+        toast.error(err.message);
+    }
+  }
+
+  const handleLeaveGroup = async () => {
+    try {
+        await leaveConversationGroup(conversation.conversationId);
+        toast.success("Rời nhóm thành công");
+        await loadConversations();
+    } catch (error) {
+        const err = error as ApiResponse<void>;
+        toast.error(err.message);
+    }
+  }
 
   const handleClickRemoveFriend = async (id: string) => {
       const result: ApiResponse<void> = await removeFriend(id)
       if(result.code === 200) {
         toast.success("Hủy kết bạn thành công");
-        useConversationStore.getState().loadConversations();
+        await loadConversations();
         return
       }
       toast.error(result.message);
   }
 
   return (
+    
   <SidebarMenuButton
     className="
       group relative h-[72px] rounded-2xl px-3 py-2
@@ -50,6 +94,20 @@ export default function ConversationItem({ conversation }: Props) {
     "
     onClick={() => setSelectedConversation(conversation)}
   >
+    <GroupParticipantsDialog
+      open={openMembers}
+      onOpenChange={setOpenMembers}
+    />
+    <AddMemberDialog
+      open={openFriendNotInGroup}
+      onOpenChange={setOpenFriendNotInGroup}
+    />
+    <UpdateGroupDialog
+      open={openUpdateGroupInfo}
+      onOpenChange={setOpenUpdateGroupInfo}
+    />
+
+
     {/* AVATAR */}
     <div className="relative shrink-0">
       {avatar ? (
@@ -119,15 +177,12 @@ export default function ConversationItem({ conversation }: Props) {
         <div className="flex-1" />
 
         {/* MENU */}
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={(open) => { if (open) {setSelectedConversation(conversation);}}}>
           <DropdownMenuTrigger asChild>
             <button
-              onClick={(e) => e.stopPropagation()}
               className="
                 opacity-100
                 transition-all
-
-               
 
                 flex h-8 w-8 items-center justify-center
                 rounded-lg
@@ -165,20 +220,49 @@ export default function ConversationItem({ conversation }: Props) {
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    console.log("Rời nhóm")
+                    handleLeaveGroup()
                   }}
                 >
                   Rời nhóm
                 </DropdownMenuItem>
-
                 <DropdownMenuItem
                   onClick={(e) => {
                     e.stopPropagation()
-                    console.log("Xem thành viên")
+                    handleOpenMembers();
                   }}
                 >
                   Xem thành viên
                 </DropdownMenuItem>
+                {isAdmin && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleOpenFriendNotInGroup();
+                  }}
+                >
+                  Thêm thành viên
+                </DropdownMenuItem>
+                )}
+                {isAdmin && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleOpenUpdateGroupInfo();
+                  }}
+                >
+                  Sửa thông tin nhóm
+                </DropdownMenuItem>
+                )}
+                 {isAdmin && (
+                <DropdownMenuItem
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleRemoveGroupChat();
+                  }}
+                >
+                  Giải tán nhóm
+                </DropdownMenuItem>
+                )}
               </>
             )}
           </DropdownMenuContent>
@@ -193,7 +277,9 @@ export default function ConversationItem({ conversation }: Props) {
           text-sm
           text-sidebar-foreground/60
         ">
-        {conversation.lastMessage || "Chưa có tin nhắn"}
+          {conversation.lastMessageType === MessageType.IMAGE
+          ? "📷 Ảnh"
+          : conversation.lastMessage || "Chưa có tin nhắn"}
       </div>
     </div>
   </SidebarMenuButton>

@@ -1,13 +1,17 @@
-import type { ConversationParticipantRole, ConversationType } from "../enums/enums.type"
+import type {  ConversationType } from "../enums/enums.type"
 
 export interface CreateConversationRequest {
+  avatarGroup?: string
   type: ConversationType
   name?: string
   participantIds: string[] 
 }
 
 export interface AddParticipantRequest {
-  conversationId: string 
   userId: string 
-  role: ConversationParticipantRole
+}
+
+export interface UpdateConversationRequest{
+  name?: string
+  avatarGroup?: string
 }

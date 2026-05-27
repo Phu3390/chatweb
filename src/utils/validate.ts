@@ -52,3 +52,14 @@ export const validateFormUpdateProfile = (data: {  fullName: string;
   }
   return null;
 }
+
+export const validateFormCreateGroup = (data: {  groupName: string;
+  selectedUsers: string[];}) => {
+  if (!data.groupName || !data.selectedUsers || data.selectedUsers.length === 0) {
+    return "Vui lòng nhập đầy đủ thông tin";
+  }
+    if (data.groupName.trim().length < 2) {
+    return "Tên nhóm phải có ít nhất 2 ký tự";
+  }
+  return null;
+}

@@ -4,14 +4,14 @@ import { User } from "lucide-react"
 import { useConversationStore } from "../../store/conversationStore"
 import { useMessageStore } from "../../store/messageStore"
 import { useAuthStore } from "../../store/authStore"
+import { MessageType } from "../../types/enums/enums.type"
 export default function ChatConversation() {
   const selectedConversation = useConversationStore(
     (s) => s.selectedConversation
   )
 
-  const currentUser = useAuthStore(
-    (s) => s.user
-  )
+  const currentUser = useAuthStore((s) => s.user)
+
 
   const {
     messagePage,
@@ -235,91 +235,110 @@ export default function ChatConversation() {
                   </div>
                 )}
 
-                {/* BUBBLE */}
-                <div
-                  className={`
-                    max-w-[75%] min-w-[120px]
+                {message.messageType === MessageType.IMAGE ? (
+                  <div className="flex flex-col">
+                    <img
+                      src={message.content}
+                      alt=""
+                      className="
+                        max-w-[320px]
+                        rounded-2xl
+                        shadow-md
+                        cursor-pointer
+                        hover:opacity-95
+                        transition
+                      "
+                    />
 
-                    px-4 py-2.5
-
-                    text-[15px]
-                    leading-relaxed
-
-                    shadow-sm
-
-                    ${
-                      isMine
-                        ? `
-                          rounded-2xl
-                          rounded-br-md
-
-                          bg-[#0084ff]
-                          text-white
-                        `
-                        : `
-                          rounded-2xl
-                          rounded-bl-md
-
-                          bg-white
-                          dark:bg-slate-800
-
-                          text-slate-800
-                          dark:text-white
-                        `
-                    }
-                  `}
-                >
-                  {/* CONTENT */}
-                  {!isMine && showAvatar && (
-                  <div
-                    className="
-                      mb-1 text-[13px]
-                      font-semibold
-
-                      text-slate-500
-                      dark:text-slate-400
-                    "
-                  >
-                    {message.sender.fullName}
+                    <span
+                      className={`
+                        mt-1 text-[10px]
+                        ${
+                          isMine
+                            ? "text-right text-slate-500"
+                            : "text-slate-400"
+                        }
+                      `}
+                    >
+                      {new Date(message.createdAt).toLocaleTimeString(
+                        [],
+                        {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </span>
                   </div>
-                )}
-                  <p
-                    className="
-                      whitespace-pre-wrap
-                      break-words
-                    "
-                  >
-                    {message.content}
-                  </p>
-
-                  {/* TIME */}
+                ) : (
                   <div
                     className={`
-                      mt-1 text-[10px]
+                      max-w-[75%] min-w-[120px]
+                      px-4 py-2.5
+                      text-[15px]
+                      leading-relaxed
+                      shadow-sm
 
                       ${
                         isMine
-                          ? "text-cyan-100"
+                          ? `
+                            rounded-2xl
+                            rounded-br-md
+                            bg-[#0084ff]
+                            text-white
+                          `
                           : `
-                            text-slate-400
-                            dark:text-slate-500
+                            rounded-2xl
+                            rounded-bl-md
+                            bg-white
+                            dark:bg-slate-800
+                            text-slate-800
+                            dark:text-white
                           `
                       }
                     `}
                   >
-                    {new Date(
-                      message.createdAt
-                    ).toLocaleTimeString(
-                      [],
-                      {
-                        hour:
-                          "2-digit",
-                        minute:
-                          "2-digit",
-                      }
+                    {!isMine && showAvatar && (
+                      <div
+                        className="
+                          mb-1 text-[13px]
+                          font-semibold
+                          text-slate-500
+                          dark:text-slate-400
+                        "
+                      >
+                        {message.sender.fullName}
+                      </div>
                     )}
+
+                    <p
+                      className="
+                        whitespace-pre-wrap
+                        break-words
+                      "
+                    >
+                      {message.content}
+                    </p>
+
+                    <div
+                      className={`
+                        mt-1 text-[10px]
+                        ${
+                          isMine
+                            ? "text-cyan-100"
+                            : "text-slate-400 dark:text-slate-500"
+                        }
+                      `}
+                    >
+                      {new Date(message.createdAt).toLocaleTimeString(
+                        [],
+                        {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )
           }

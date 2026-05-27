@@ -1,13 +1,17 @@
 import type { FriendRequestStatus } from "../types/enums/enums.type";
 import type { UpdateProfileRequest } from "../types/request/auth.request";
 import type { ApiResponse } from "../types/response/api.response";
-import type { FriendRequestResponse, UploadResponse, UserResponse } from "../types/response/response.type";
+import type {
+  FriendRequestResponse,
+  UploadResponse,
+  UserResponse,
+} from "../types/response/response.type";
 import { api, axiosClient } from "./axios";
 
 export const userService = {
   search: async (keyword: string): Promise<ApiResponse<UserResponse[]>> => {
     return axiosClient.get<UserResponse[]>(
-      `/api/search?keyword=${encodeURIComponent(keyword)}`
+      `/api/search?keyword=${encodeURIComponent(keyword)}`,
     );
   },
 
@@ -15,27 +19,41 @@ export const userService = {
     return axiosClient.get<number>(`/api/friendinvitations/count`);
   },
 
-  getFriendInvitation: async (): Promise<ApiResponse<FriendRequestResponse[]>> => {
+  getFriendInvitation: async (): Promise<
+    ApiResponse<FriendRequestResponse[]>
+  > => {
     return axiosClient.get<FriendRequestResponse[]>(`/api/friendinvitations`);
   },
 
-  getFriendStatus: async (status: FriendRequestStatus): Promise<ApiResponse<FriendRequestResponse[]>> => {
-    return axiosClient.get<FriendRequestResponse[]>(`/api/friendstatus?status=${status}`);
+  getFriendStatus: async (
+    status: FriendRequestStatus,
+  ): Promise<ApiResponse<FriendRequestResponse[]>> => {
+    return axiosClient.get<FriendRequestResponse[]>(
+      `/api/friendstatus?status=${status}`,
+    );
   },
 
   removeFriend: async (friendId: string): Promise<ApiResponse<void>> => {
     return axiosClient.delete<void>(`/friends/remove/${friendId}`);
   },
 
-  updateProfile: async (profileData: UpdateProfileRequest): Promise<ApiResponse<UserResponse>> => {
+  updateProfile: async (
+    profileData: UpdateProfileRequest,
+  ): Promise<ApiResponse<UserResponse>> => {
     return axiosClient.put<UserResponse>(`/api/update/profile`, profileData);
   },
 
-  uploadFile: async (formData: FormData): Promise<ApiResponse<UploadResponse>> => {
-    return api.post("/api/upload/image", formData, {headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+  uploadFile: async (
+    formData: FormData,
+  ): Promise<ApiResponse<UploadResponse>> => {
+    return api.post("/api/upload/image", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
   },
-}
+
+  getMyFriendConversations: async (): Promise<ApiResponse<UserResponse[]>> => {
+    return axiosClient.get<UserResponse[]>("/api/myfriends");
+  },
+};

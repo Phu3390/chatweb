@@ -9,6 +9,8 @@ type UserState = {
   countFriendInvitation?: number;
   friendInvitationResult: FriendRequestResponse[];
 
+  myFriends?: UserResponse[];
+
 
   setSearchResults: (searchResults: UserResponse[]) => void;
   setCountFriendInvitation: (count: number) => void;
@@ -26,10 +28,13 @@ type UserState = {
   removeFriend: (friendId: string) => Promise<ApiResponse<void>>;
   updateProfile:(profileData: UpdateProfileRequest) => Promise<ApiResponse<UserResponse>>;
   uploadImage: (file: File) => Promise<ApiResponse<UploadResponse>>;
+  getMyFriends: () => Promise<ApiResponse<UserResponse[]>>;
 
 };
 
 export const useUserStore = create<UserState>((set) => ({
+
+  myFriends: [],
   searchResults: [],
 
   countFriendInvitation: 0,
@@ -167,6 +172,21 @@ export const useUserStore = create<UserState>((set) => ({
       return res;
     }catch(error) {
         const errorResponse = error as ApiResponse<UploadResponse>;
+        set({ error: errorResponse.message });
+        return errorResponse;
+      } finally {
+      set({ loading: false });
+    }
+  },
+  getMyFriends: async (): Promise<ApiResponse<UserResponse[]>> => {
+    try {
+      set({ loading: true });
+      set({ error: null });
+      const res: ApiResponse<UserResponse[]> = await userService.getMyFriendConversations();
+      set({ myFriends: res.data ?? [] });
+      return res;
+    }catch(error) {
+        const errorResponse = error as ApiResponse<UserResponse[]>;
         set({ error: errorResponse.message });
         return errorResponse;
       } finally {

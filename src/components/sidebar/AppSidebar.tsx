@@ -18,6 +18,7 @@ import FriendSearchDialog from "../dialog/FriendSearchDialog"
 import { useState } from "react"
 import { useConversationStore } from "../../store/conversationStore"
 import UserProfileDialog from "../dialog/UserProfileDialog"
+import CreateGroupDialog from "../dialog/CreateGroupDialog"
 
 export function AppSidebar() {
   const {conversations} = useConversationStore()
@@ -31,6 +32,12 @@ export function AppSidebar() {
   const [openSearch, setOpenSearch] = useState(false);
   const handleOpenSearch = () => {
       setOpenSearch(true);
+  }
+
+  
+  const [openCreateGroupDialog, setOpenCreateGroupDialog] = useState(false);
+  const handleOpenCreateGroupDialog = () => {
+      setOpenCreateGroupDialog(true);
   }
   return (
     
@@ -46,6 +53,7 @@ export function AppSidebar() {
       
       <FriendSearchDialog open={openSearch} onOpenChange={setOpenSearch}/>
       <UserProfileDialog open={openProfile} onOpenChange={setOpenProfile}/>
+      <CreateGroupDialog open={openCreateGroupDialog} onOpenChange={setOpenCreateGroupDialog}/>
 
       {/* HEADER */}
       <SidebarHeader
@@ -87,6 +95,7 @@ export function AppSidebar() {
           </span>
 
           <button
+            onClick={handleOpenCreateGroupDialog}
             className="
               flex h-6 w-6 items-center justify-center
               rounded-md

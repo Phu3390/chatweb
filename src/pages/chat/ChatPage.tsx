@@ -44,8 +44,21 @@ export default function ChatPage() {
   }
 
   return (
-    <ChatLayout conversations={conversations} user={user} headerName={selectedConversation?.targetUser?.fullName}
-    headerAvatar={selectedConversation?.targetUser?.avatar} countFriendInvitation={countFriendInvitation}>
+   <ChatLayout
+      conversations={conversations}
+      user={user}
+      headerName={
+        selectedConversation?.type === "GROUP"
+          ? selectedConversation.name
+          : selectedConversation?.targetUser?.fullName
+      }
+      headerAvatar={
+        selectedConversation?.type === "GROUP"
+          ? selectedConversation.avatarGroup
+          : selectedConversation?.targetUser?.avatar
+      }
+      countFriendInvitation={countFriendInvitation}
+    >
       <div
       className="
         flex h-full flex-1

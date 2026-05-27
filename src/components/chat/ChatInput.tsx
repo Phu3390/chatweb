@@ -1,9 +1,11 @@
-import { Send } from "lucide-react"
+import { Send,ImagePlus, Loader2 } from "lucide-react"
 import { useMessageStore } from "../../store/messageStore"
 import type { SendMessageRequest } from "../../types/request/message.request";
 import { MessageType } from "../../types/enums/enums.type";
 import { useConversationStore } from "../../store/conversationStore";
 import { useState } from "react";
+import { useRef } from "react";
+import { useUserStore } from "../../store/userStore";
 
 
 export default function ChatInput() {
@@ -11,8 +13,38 @@ export default function ChatInput() {
   const {selectedConversation} = useConversationStore()
   const [content, setContent] = useState("")
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { uploadImage, loading } = useUserStore();
+
+  const handleSendImage = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+
+    if (!file || !selectedConversation) return;
+    try {
+      const uploadResult = await uploadImage(file);
+      if (
+        uploadResult.code !== 200 ||
+        !uploadResult.data
+      ) {
+        return;
+      }
+      await sendMessage({
+        conversationId:
+          selectedConversation.conversationId,
+        content: uploadResult.data.url,
+        messageType: MessageType.IMAGE,
+      });
+    } finally {
+      e.target.value = "";
+    }
+  };
+
   const handleSendMessage = async () => {
     if(!selectedConversation) return
+    if(content.trim() === "") return
     const payload: SendMessageRequest = {
       conversationId: selectedConversation?.conversationId,
       content: content,
@@ -83,7 +115,39 @@ export default function ChatInput() {
           "
           onClick={handleSendMessage}
         >
+          
           <Send size={18} />
+        </button>
+          <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={handleSendImage}
+        />
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => fileInputRef.current?.click()}
+          className="
+            flex h-10 w-10 items-center justify-center
+            rounded-xl
+            text-cyan-400
+            transition
+            hover:bg-slate-200
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+            dark:hover:bg-white/10
+          "
+        >
+          {loading ? (
+            <Loader2
+              size={20}
+              className="animate-spin"
+            />
+          ) : (
+            <ImagePlus size={20} />
+          )}
         </button>
       </div>
     </div>

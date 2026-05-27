@@ -40,6 +40,7 @@ export interface ParticipantResponse {
   avatar?: string;
   role: ConversationParticipantRole;
   isMuted: boolean;
+  lastReadAt?: string;
   joinedAt: string;
 }
 
@@ -62,6 +63,8 @@ export interface ConversationSummaryResponse {
   lastSenderName?: string;
   lastMessageAt?: string;
   unreadCount: number;
+  avatarGroup?: string;
+  role?: ConversationParticipantRole;
 }
 
 export interface MessageResponse{
